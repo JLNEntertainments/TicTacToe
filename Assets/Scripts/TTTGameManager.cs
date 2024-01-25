@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class TTTGameManager : MonoBehaviour
@@ -21,28 +22,32 @@ public class TTTGameManager : MonoBehaviour
     public bool isGameOver = false;
     private AI ai;
     public bool isAIMoving = false;
+
+    public GameObject gameOverPanel;
     void Awake()
     {
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
+            //DontDestroyOnLoad(gameObject);
         }
         else
         {
-            Destroy(gameObject);
+            //Destroy(gameObject);
         }
 
-        if (isVsAI)
-        {
-            ai = new AI(this, 9);
-        }
+        
 
     }
 
     void Start()
     {
         InitializeBoard();
+        gameOverPanel.SetActive(false);
+        if (isVsAI)
+        {
+            ai = new AI(this, 9);
+        }
     }
 
     private void InitializeBoard()
@@ -131,7 +136,7 @@ public class TTTGameManager : MonoBehaviour
                 boardState[row, 0] == boardState[row, 1] &&
                 boardState[row, 1] == boardState[row, 2])
             {
-                isGameOver = true;
+              
                 return true; // There's a winning row
             }
         }
@@ -143,7 +148,7 @@ public class TTTGameManager : MonoBehaviour
                 boardState[0, col] == boardState[1, col] &&
                 boardState[1, col] == boardState[2, col])
             {
-                isGameOver = true;
+               
                 return true; // There's a winning column
             }
         }
@@ -153,7 +158,7 @@ public class TTTGameManager : MonoBehaviour
             boardState[0, 0] == boardState[1, 1] &&
             boardState[1, 1] == boardState[2, 2])
         {
-            isGameOver = true;
+           
             return true; // There's a winning diagonal (top-left to bottom-right)
         }
 
@@ -161,13 +166,19 @@ public class TTTGameManager : MonoBehaviour
             boardState[0, 2] == boardState[1, 1] &&
             boardState[1, 1] == boardState[2, 0])
         {
-            isGameOver = true;
+           
             return true; // There's a winning diagonal (top-right to bottom-left)
         }
 
         return false; // No winner
     }
 
+  
+    public void GameRestart()
+    {
+        gameOverPanel.SetActive(false);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
 
     private void SwitchTurns()
     {
@@ -177,6 +188,11 @@ public class TTTGameManager : MonoBehaviour
 
     private void EndGame(string message)
     {
+        isGameOver = true;
+        gameOverPanel.SetActive(true);
+        Text gameOverText = gameOverPanel.GetComponentInChildren<Text>();
+
+        gameOverText.text = message;
         Debug.Log(message);
         // Add logic to handle the end of the game
     }
@@ -224,8 +240,20 @@ public class TTTGameManager : MonoBehaviour
                 // Assuming there's a method to convert (x, y) to a Cell object or its equivalent
                 Cell cell = ConvertToCell(x, y);
                 PlaceMarker(Player.Player2, cell);
-                isAIMoving = false;
-                SwitchTurns();
+                if (CheckForWin())
+                {
+                    EndGame(currentPlayer + " wins!");
+                }
+                else if (IsBoardFull())
+                {
+                    EndGame("It's a draw!");
+                }
+                else
+                {
+                    isAIMoving = false;
+                    SwitchTurns();
+                }
+                
             }
         }
     }
