@@ -16,7 +16,7 @@ public class Cell : MonoBehaviour
     }
     private void OnMouseDown()
     {
-        if (!TTTGameManager.Instance.isGameOver)
+        if (!TTTGameManager.Instance.isGameOver && !TTTGameManager.Instance.isAIMoving)
         {
             OnClick();
         }

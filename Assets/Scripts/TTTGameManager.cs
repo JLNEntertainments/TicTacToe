@@ -8,17 +8,19 @@ public class TTTGameManager : MonoBehaviour
     public GameObject[] cells = new GameObject[9]; // Cells assigned from Unity Inspector
 
     private enum Player { Player1, Player2 }
-    private enum CellState { Empty, Player1, Player2 }
+    public enum CellState { Empty, Player1, Player2 }
 
     public static TTTGameManager Instance { get; private set; }
     public GameObject xPrefab; // Assign in Unity Inspector
     public GameObject oPrefab; // Assign in Unity Inspector
-    private CellState[,] boardState = new CellState[3, 3]; // Tracks the board's state
+    public CellState[,] boardState = new CellState[3, 3]; // Tracks the board's state
 
     private Player currentPlayer = Player.Player1;
     [SerializeField]
     private bool isVsAI;
     public bool isGameOver = false;
+    private AI ai;
+    public bool isAIMoving = false;
     void Awake()
     {
         if (Instance == null)
@@ -30,6 +32,12 @@ public class TTTGameManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+
+        if (isVsAI)
+        {
+            ai = new AI(this);
+        }
+
     }
 
     void Start()
@@ -70,6 +78,7 @@ public class TTTGameManager : MonoBehaviour
             SwitchTurns();
             if (isVsAI && currentPlayer == Player.Player2)
             {
+                isAIMoving = true;
                 Invoke("AIPerformMove", 1.0f);
             }
         }
@@ -89,14 +98,16 @@ public class TTTGameManager : MonoBehaviour
         int x = cell.X;
         int y = cell.Y;
         boardState[x, y] = player == Player.Player1 ? CellState.Player1 : CellState.Player2;
+
+        UpdateCellDisplay(cell.X, cell.Y, player == Player.Player1 ? CellState.Player1 : CellState.Player2);
     }
 
-    private bool IsCellEmpty(int x, int y)
+    public bool IsCellEmpty(int x, int y)
     {
         return boardState[x, y] == CellState.Empty;
     }
 
-    private bool IsBoardFull()
+    public bool IsBoardFull()
     {
         for (int i = 0; i < 3; i++)
         {
@@ -172,7 +183,57 @@ public class TTTGameManager : MonoBehaviour
 
     private void AIPerformMove()
     {
-        // AI move logic
+        // AI move logic - using a simple heuristic for demonstration
+        // A more sophisticated approach would be the Minimax algorithm
+        for (int i = 0; i < 3; i++)
+        {
+            for (int j = 0; j < 3; j++)
+            {
+                if (boardState[i, j] == CellState.Empty)
+                {
+                    // AI places its marker in the first empty cell it finds
+                    boardState[i, j] = CellState.Player2; // Assuming AI is Player2
+                    UpdateCellDisplay(i, j, CellState.Player2);
+
+                    if (CheckForWin())
+                    {
+                        EndGame("AI wins!");
+                    }
+                    else if (IsBoardFull())
+                    {
+                        EndGame("It's a draw!");
+                    }
+                    else
+                    {
+                        isAIMoving = false;
+                        SwitchTurns();
+                    }
+                    return;
+                }
+            }
+        }
+    }
+
+
+    private void UpdateCellDisplay(int x, int y, CellState state)
+    {
+        GameObject prefabToInstantiate = state == CellState.Player1 ? xPrefab : oPrefab;
+
+        // Calculate the index in the cells array
+        int index = x * 3 + y; // Assuming a 3x3 grid
+
+        if (index >= 0 && index < cells.Length)
+        {
+            // Get the position of the cell
+            Vector3 cellPosition = cells[index].transform.position;
+
+            // Instantiate the prefab at the cell's position
+            Instantiate(prefabToInstantiate, cellPosition, Quaternion.identity, cells[index].transform);
+        }
+        else
+        {
+            Debug.LogError("Invalid cell index: " + index);
+        }
     }
 
     private void UpdateTurnDisplay()

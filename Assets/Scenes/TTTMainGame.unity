@@ -678,7 +678,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1001 &640261962
+--- !u!1001 &895516802
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -755,7 +755,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7012477320752650000, guid: dde8ce5d8c6bd99419c26897852184be, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 232
+      value: 232.19
       objectReference: {fileID: 0}
     - target: {fileID: 7012477320752650000, guid: dde8ce5d8c6bd99419c26897852184be, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -775,23 +775,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: dde8ce5d8c6bd99419c26897852184be, type: 3}
---- !u!224 &640261963 stripped
+--- !u!224 &895516803 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 7012477320752650000, guid: dde8ce5d8c6bd99419c26897852184be, type: 3}
-  m_PrefabInstance: {fileID: 640261962}
+  m_PrefabInstance: {fileID: 895516802}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &640261964 stripped
+--- !u!1 &895516804 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4763341750841616415, guid: dde8ce5d8c6bd99419c26897852184be, type: 3}
-  m_PrefabInstance: {fileID: 640261962}
+  m_PrefabInstance: {fileID: 895516802}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &640261965
+--- !u!114 &895516805
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 640261964}
+  m_GameObject: {fileID: 895516804}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8e56cee44325f1a47bf44cf344b61755, type: 3}
@@ -1020,7 +1020,7 @@ RectTransform:
   m_Children:
   - {fileID: 2068656768}
   - {fileID: 1896504533}
-  - {fileID: 640261963}
+  - {fileID: 895516803}
   - {fileID: 293102529}
   - {fileID: 241206712}
   - {fileID: 2042444137}
@@ -1347,7 +1347,7 @@ MonoBehaviour:
   cells:
   - {fileID: 2068656769}
   - {fileID: 1896504534}
-  - {fileID: 0}
+  - {fileID: 895516804}
   - {fileID: 293102530}
   - {fileID: 241206713}
   - {fileID: 2042444138}
@@ -1356,6 +1356,9 @@ MonoBehaviour:
   - {fileID: 1529188851}
   xPrefab: {fileID: 5709652061388837997, guid: d0b3c47ce544be644b319f430f912400, type: 3}
   oPrefab: {fileID: 5471597821212823878, guid: a710583b233495e44bda83dee5ab059a, type: 3}
+  isVsAI: 1
+  isGameOver: 0
+  isAIMoving: 0
 --- !u!1001 &1896504532
 PrefabInstance:
   m_ObjectHideFlags: 0
