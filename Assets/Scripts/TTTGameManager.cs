@@ -35,7 +35,7 @@ public class TTTGameManager : MonoBehaviour
 
         if (isVsAI)
         {
-            ai = new AI(this);
+            ai = new AI(this, 9);
         }
 
     }
@@ -181,7 +181,7 @@ public class TTTGameManager : MonoBehaviour
         // Add logic to handle the end of the game
     }
 
-    private void AIPerformMove()
+    /*private void AIPerformMove()
     {
         // AI move logic - using a simple heuristic for demonstration
         // A more sophisticated approach would be the Minimax algorithm
@@ -212,7 +212,37 @@ public class TTTGameManager : MonoBehaviour
                 }
             }
         }
+    }*/
+
+    private void AIPerformMove()
+    {
+        if (isVsAI && currentPlayer == Player.Player2)
+        {
+            (int x, int y) = ai.GetBestMove();
+            if (x >= 0 && y >= 0)
+            {
+                // Assuming there's a method to convert (x, y) to a Cell object or its equivalent
+                Cell cell = ConvertToCell(x, y);
+                PlaceMarker(Player.Player2, cell);
+                isAIMoving = false;
+                SwitchTurns();
+            }
+        }
     }
+
+    private Cell ConvertToCell(int x, int y)
+    {
+        foreach (GameObject cellObj in cells)
+        {
+            Cell cell = cellObj.GetComponent<Cell>();
+            if (cell != null && cell.X == x && cell.Y == y)
+            {
+                return cell;
+            }
+        }
+        return null; // Return null if no matching cell is found
+    }
+
 
 
     private void UpdateCellDisplay(int x, int y, CellState state)

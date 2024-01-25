@@ -5,10 +5,12 @@ using UnityEngine;
 public class AI
 {
     private TTTGameManager gameManager;
+    private int maxDepth;
 
-    public AI(TTTGameManager manager)
+    public AI(TTTGameManager manager, int maxDepth = 9) // Tic-Tac-Toe has a max depth of 9
     {
         gameManager = manager;
+        this.maxDepth = maxDepth;
     }
 
     public (int, int) GetBestMove()
@@ -26,10 +28,12 @@ public class AI
                 if (gameManager.IsCellEmpty(x, y))
                 {
                     // Make the move
-                    gameManager.boardState[x, y] = TTTGameManager.CellState.Player2; // Assuming AI is Player2
+                    gameManager.boardState[x, y] = TTTGameManager.CellState.Player2; // AI's move
 
-                    // Compute the score using Minimax
-                    int score = Minimax(3, true);
+                    // Compute the score using Minimax with alpha-beta pruning
+                    int alpha = int.MinValue;
+                    int beta = int.MaxValue;
+                    int score = Minimax(0, false, alpha, beta); // Start at depth 0, AI is the minimizing player initially
 
                     // Undo the move
                     gameManager.boardState[x, y] = TTTGameManager.CellState.Empty;
@@ -47,16 +51,16 @@ public class AI
         return bestMove;
     }
 
-    private int Minimax(int depth, bool isMaximizing)
+
+
+    private int Minimax(int depth, bool isMaximizing, int alpha, int beta)
     {
-        Debug.Log($"Minimax called at depth {depth} - Maximizing: {isMaximizing}");
-
         int score = EvaluateBoard();
-        Debug.Log($"Evaluated board score: {score}");
 
-        // If the game has ended, return the score from the AI's perspective
-        if (score != 0 || gameManager.IsBoardFull())
+        // Check if the maximum depth has been reached or the game is over
+        if (depth >= maxDepth || score != 0 || gameManager.IsBoardFull())
             return score;
+
 
         if (isMaximizing)
         {
@@ -67,10 +71,13 @@ public class AI
                 {
                     if (gameManager.boardState[i, j] == TTTGameManager.CellState.Empty)
                     {
-                        gameManager.boardState[i, j] = TTTGameManager.CellState.Player2; // AI's move
-                        int scoreTemp = Minimax(depth + 1, true);
-                        gameManager.boardState[i, j] = TTTGameManager.CellState.Empty; // Undo move
+                        gameManager.boardState[i, j] = TTTGameManager.CellState.Player2;
+                        int scoreTemp = Minimax(depth + 1, false, alpha, beta);
+                        gameManager.boardState[i, j] = TTTGameManager.CellState.Empty;
                         bestScore = Mathf.Max(scoreTemp, bestScore);
+                        alpha = Mathf.Max(alpha, bestScore);
+                        if (beta <= alpha)
+                            break;
                     }
                 }
             }
@@ -85,16 +92,21 @@ public class AI
                 {
                     if (gameManager.boardState[i, j] == TTTGameManager.CellState.Empty)
                     {
-                        gameManager.boardState[i, j] = TTTGameManager.CellState.Player1; // Player's move
-                        int scoreTemp = Minimax(depth + 1, true);
-                        gameManager.boardState[i, j] = TTTGameManager.CellState.Empty; // Undo move
+                        gameManager.boardState[i, j] = TTTGameManager.CellState.Player1;
+                        int scoreTemp = Minimax(depth + 1, true, alpha, beta);
+                        gameManager.boardState[i, j] = TTTGameManager.CellState.Empty;
                         bestScore = Mathf.Min(scoreTemp, bestScore);
+                        beta = Mathf.Min(beta, bestScore);
+                        if (beta <= alpha)
+                            break;
                     }
                 }
             }
             return bestScore;
         }
     }
+
+
 
     private int EvaluateBoard()
     {
