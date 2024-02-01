@@ -8,6 +8,9 @@ public class TTTGameManager : MonoBehaviour
 {
     public GameObject[] cells = new GameObject[9]; // Cells assigned from Unity Inspector
 
+    [SerializeField]
+    UIManager uiManager;
+
     private enum Player { Player1, Player2 }
     public enum CellState { Empty, Player1, Player2 }
 
@@ -17,13 +20,14 @@ public class TTTGameManager : MonoBehaviour
     public CellState[,] boardState = new CellState[3, 3]; // Tracks the board's state
 
     private Player currentPlayer = Player.Player1;
+
     [SerializeField]
     private bool isVsAI;
     public bool isGameOver = false;
     private AI ai;
     public bool isAIMoving = false;
 
-    public GameObject gameOverPanel;
+    
     void Awake()
     {
         if (Instance == null)
@@ -35,15 +39,12 @@ public class TTTGameManager : MonoBehaviour
         {
             //Destroy(gameObject);
         }
-
-        
-
     }
 
     void Start()
     {
         InitializeBoard();
-        gameOverPanel.SetActive(false);
+        
         if (isVsAI)
         {
             ai = new AI(this, 9);
@@ -72,10 +73,14 @@ public class TTTGameManager : MonoBehaviour
 
         if (CheckForWin())
         {
+            uiManager.ShowGameOverPanel();
+            uiManager.DisplayPlayerWonPanel();
             EndGame(currentPlayer + " wins!");
         }
         else if (IsBoardFull())
         {
+            uiManager.ShowGameOverPanel();
+            uiManager.DisplayDrawGamePanel();
             EndGame("It's a draw!");
         }
         else
@@ -173,10 +178,8 @@ public class TTTGameManager : MonoBehaviour
         return false; // No winner
     }
 
-  
     public void GameRestart()
     {
-        gameOverPanel.SetActive(false);
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
@@ -189,10 +192,6 @@ public class TTTGameManager : MonoBehaviour
     private void EndGame(string message)
     {
         isGameOver = true;
-        gameOverPanel.SetActive(true);
-        Text gameOverText = gameOverPanel.GetComponentInChildren<Text>();
-
-        gameOverText.text = message;
         Debug.Log(message);
         // Add logic to handle the end of the game
     }
@@ -242,10 +241,14 @@ public class TTTGameManager : MonoBehaviour
                 PlaceMarker(Player.Player2, cell);
                 if (CheckForWin())
                 {
+                    uiManager.ShowGameOverPanel();
+                    uiManager.DisplayAIWonPanel();
                     EndGame(currentPlayer + " wins!");
                 }
                 else if (IsBoardFull())
                 {
+                    uiManager.ShowGameOverPanel();
+                    uiManager.DisplayDrawGamePanel();
                     EndGame("It's a draw!");
                 }
                 else
@@ -271,8 +274,6 @@ public class TTTGameManager : MonoBehaviour
         return null; // Return null if no matching cell is found
     }
 
-
-
     private void UpdateCellDisplay(int x, int y, CellState state)
     {
         GameObject prefabToInstantiate = state == CellState.Player1 ? xPrefab : oPrefab;
@@ -292,6 +293,11 @@ public class TTTGameManager : MonoBehaviour
         {
             Debug.LogError("Invalid cell index: " + index);
         }
+
+        if(state == CellState.Player1)
+            ScoreManager.Instance.tempPlayerScore++;
+        else
+            ScoreManager.Instance.tempAIScore++;
     }
 
     private void UpdateTurnDisplay()
